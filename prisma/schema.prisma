@@ -1,17 +1,74 @@
 generator client {
   provider = "prisma-client-js"
 }
- 
+
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
- 
+
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  image     String
+  id        String           @id
+  createdAt DateTime         @default(now())
+  follows   FollowRelation[] @relation("FollowerRelation")
+  followers FollowRelation[] @relation("FollowRelation")
+  monitors  Monitor[]
+  notifications Notification[]
+}
+
+model FollowRelation {
+  follower         User              @relation("FollowerRelation", fields: [followerId], references: [id])
+  followerId       String
+  followed         User              @relation("FollowRelation", fields: [followedId], references: [id])
+  followedId       String
+  createdAt        DateTime          @default(now())
+  unfollowMonitors unfollowMonitor[]
+
+  @@id([followerId, followedId], name: "id")
+}
+
+model unfollowMonitor {
+  monitor    Monitor        @relation(fields: [monitorId], references: [id])
+  monitorId  String
+  followRel  FollowRelation @relation(fields: [followerId, followedId], references: [followerId, followedId])
+  followerId String
+  followedId String
+
+  @@id([monitorId, followerId, followedId], name: "id")
+}
+
+model Monitor {
+  id              String            @id @default(uuid())
+  name            String?
+  intervalMs      Int
+  network         Network
+  owner           User              @relation(fields: [ownerId], references: [id])
+  ownerId         String
+  typeOfMonitor   TypeOfMonitor
+  Address         String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  unfollowMonitor unfollowMonitor[]
+  notifications   Notification[]
+}
+
+enum TypeOfMonitor {
+  INCOMING
+  OUTGOING
+}
+
+enum Network {
+  MAINNET
+  TESTNET
+}
+
+model Notification {
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
+  monitor   Monitor  @relation(fields: [monitorId], references: [id])
+  monitorId String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  read      Boolean  @default(false)
 }
