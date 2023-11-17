@@ -1,18 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { User, Prisma } from '@prisma/client';
+import { User, Prisma, Notification, Monitor } from '@prisma/client';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async user(
-    params: Prisma.UserWhereUniqueInput,
-    include?: Prisma.UserInclude,
-  ): Promise<User | null> {
+  async user(params: Prisma.UserWhereUniqueInput): Promise<User | null> {
     return this.prisma.user.findUnique({
       where: params,
-      include: include,
     });
   }
 
@@ -31,6 +27,52 @@ export class UserService {
       where,
       orderBy,
     });
+  }
+
+  async notifications(
+    params: Prisma.UserWhereUniqueInput,
+  ): Promise<Notification[]> {
+    return this.prisma.user
+      .findUnique({
+        where: params,
+      })
+      .notifications();
+  }
+
+  async monitors(params: Prisma.UserWhereUniqueInput): Promise<Monitor[]> {
+    return this.prisma.user
+      .findUnique({
+        where: params,
+      })
+      .monitors();
+  }
+
+  async trackedMonitors(
+    params: Prisma.UserWhereUniqueInput,
+  ): Promise<Monitor[]> {
+    const monitors: Monitor[] = [];
+    monitors.push(...(await this.monitors(params)));
+    const user = await this.prisma.user.findUnique({
+      where: params,
+      include: {
+        follows: {
+          include: {
+            unfollowMonitors: true,
+          },
+        },
+      },
+    });
+    const follows = user.follows;
+    for (const follow of follows) {
+      monitors.push(
+        ...(await this.monitors({ id: follow.followedId })).filter((monitor) =>
+          follow.unfollowMonitors.find(
+            (unfollow) => unfollow.monitorId !== monitor.id,
+          ),
+        ),
+      );
+    }
+    return monitors;
   }
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {
