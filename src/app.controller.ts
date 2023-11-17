@@ -162,4 +162,15 @@ export class AppController {
     if (monitor.ownerId != req.session.siwe.address) return;
     await this.monitorService.deleteMonitor({ id: req.body.monitor.id });
   }
+
+  @Get('/getPopularUsers')
+  async getPopularUsers(): Promise<any> {
+    return await this.userService.users({
+      orderBy: {
+        followers: {
+          _count: 'desc',
+        },
+      },
+    });
+  }
 }
