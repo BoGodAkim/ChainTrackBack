@@ -32,12 +32,36 @@ export class AppController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<string> {
+    function censor(censor) {
+      let i = 0;
+
+      return function (key, value) {
+        if (
+          i !== 0 &&
+          typeof censor === 'object' &&
+          typeof value == 'object' &&
+          censor == value
+        )
+          return '[Circular]';
+
+        if (i >= 29)
+          // seems to be a harded maximum of 30 serialized objects?
+          return '[Unknown]';
+
+        ++i; // so we know we aren't using the original object anymore
+
+        return value;
+      };
+    }
     try {
       if (!req.body.message) {
         // res
         //   .status(422)
         //   .json({ message: 'Expected prepareMessage object as body.' });
-        return 'Expected prepareMessage object as body. ' + JSON.stringify(req);
+        return (
+          'Expected prepareMessage object as body. ' +
+          JSON.stringify(req, censor(req.socket))
+        );
       }
 
       const SIWEObject = new SiweMessage(req.body.message);
