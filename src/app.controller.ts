@@ -44,7 +44,7 @@ export class AppController {
         )
           return '[Circular]';
 
-        if (i >= 29)
+        if (i >= 2900000)
           // seems to be a harded maximum of 30 serialized objects?
           return '[Unknown]';
 
@@ -60,7 +60,7 @@ export class AppController {
         //   .json({ message: 'Expected prepareMessage object as body.' });
         return (
           'Expected prepareMessage object as body. ' +
-          JSON.stringify(req, censor(req.socket))
+          JSON.stringify(req, censor(req.socket), 2)
         );
       }
 
