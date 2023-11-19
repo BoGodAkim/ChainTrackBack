@@ -28,13 +28,16 @@ export class AppController {
   }
 
   @Post('/verify')
-  async verify(@Req() req: Request, @Res() res: Response): Promise<boolean> {
+  async verify(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<string> {
     try {
       if (!req.body.message) {
         res
           .status(422)
           .json({ message: 'Expected prepareMessage object as body.' });
-        return;
+        return 'Expected prepareMessage object as body.';
       }
 
       const SIWEObject = new SiweMessage(req.body.message);
@@ -46,6 +49,7 @@ export class AppController {
       req.session.siwe = message;
       req.session.cookie.expires = new Date(message.expirationTime);
       req.session.save(() => res.status(200).send(true));
+      return 'true';
     } catch (e) {
       req.session.siwe = null;
       req.session.nonce = null;
@@ -64,6 +68,7 @@ export class AppController {
           break;
         }
       }
+      return e.message;
     }
   }
 
