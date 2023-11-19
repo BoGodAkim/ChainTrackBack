@@ -37,7 +37,9 @@ export class AppController {
         // res
         //   .status(422)
         //   .json({ message: 'Expected prepareMessage object as body.' });
-        return 'Expected prepareMessage object as body.' + req.body;
+        return (
+          'Expected prepareMessage object as body. ' + JSON.stringify(req.body)
+        );
       }
 
       const SIWEObject = new SiweMessage(req.body.message);
