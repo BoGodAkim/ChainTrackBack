@@ -14,7 +14,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: '*',
+    origin: 'https://194.29.160.181',
     credentials: true,
   });
   await app.listen(3000);
