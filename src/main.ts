@@ -13,6 +13,10 @@ async function bootstrap() {
       cookie: { secure: true, sameSite: true },
     }),
   );
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+  });
   await app.listen(3000);
 }
 bootstrap();
