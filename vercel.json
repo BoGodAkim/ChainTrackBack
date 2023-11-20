@@ -14,7 +14,8 @@
                 "GET",
                 "POST",
                 "PUT",
-                "DELETE"
+                "DELETE",
+                "OPTIONS"
             ],
             "headers": {
                 "Access-Control-Allow-Credentials": "true",
