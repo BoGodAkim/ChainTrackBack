@@ -58,7 +58,8 @@ export class AppController {
     } catch (e) {
       req.session.siwe = null;
       req.session.nonce = null;
-      console.error(e);
+      console.log(e);
+      console.log(e.message);
       switch (e) {
         case SiweErrorType.EXPIRED_MESSAGE: {
           return req.session.save(() =>
