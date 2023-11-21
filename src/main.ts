@@ -8,7 +8,7 @@ async function bootstrap() {
     session({
       name: 'siwe',
       secret: 'O73',
-      resave: true,
+      resave: false,
       saveUninitialized: true,
       cookie: { secure: true, sameSite: true },
     }),
