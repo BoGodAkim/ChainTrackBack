@@ -45,7 +45,7 @@ export class AppController {
 
       req.session.siwe = message;
       req.session.cookie.expires = new Date(message.expirationTime);
-      req.session.save(() => res.status(200).send(true));
+      res.status(200).send(true);
       return;
     } catch (e) {
       req.session.siwe = null;
@@ -54,24 +54,15 @@ export class AppController {
       console.log(e.message);
       switch (e) {
         case SiweErrorType.EXPIRED_MESSAGE: {
-          req.session.save(() =>
-            res.status(440).json({ error: e.message ?? e }),
-          );
+          res.status(440).json({ error: e.message ?? e });
           break;
         }
         case SiweErrorType.INVALID_SIGNATURE: {
-          req.session.save(() =>
-            res.status(422).json({ error: e.message ?? e }),
-          );
+          res.status(422).json({ error: e.message ?? e });
           break;
         }
         default: {
-          // res.status(500).json({ error: e.message ?? e });
-          return req.session.save(() => {
-            if (res.headersSent !== true) {
-              res.status(500).json({ message: e.message ?? e });
-            }
-          });
+          res.status(500).json({ error: e.message ?? e });
           break;
         }
       }
