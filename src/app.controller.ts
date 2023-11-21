@@ -61,21 +61,24 @@ export class AppController {
       console.error(e);
       switch (e) {
         case SiweErrorType.EXPIRED_MESSAGE: {
-          req.session.save(() => res.status(440).json({ message: e.message }));
+          return req.session.save(() =>
+            res.status(440).json({ message: e.message }),
+          );
           break;
         }
         case SiweErrorType.INVALID_SIGNATURE: {
-          req.session.save(() => res.status(422).json({ message: e.message }));
+          return req.session.save(() =>
+            res.status(422).json({ message: e.message }),
+          );
           break;
         }
         default: {
-          req.session.save(() => res.status(500).json({ message: e.message }));
+          return req.session.save(() =>
+            res.status(500).json({ message: e.message }),
+          );
           break;
         }
       }
-      console.error(e);
-      return;
-      // return e.message;
     }
   }
 
