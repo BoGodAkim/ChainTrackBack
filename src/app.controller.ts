@@ -66,10 +66,10 @@ export class AppController {
           break;
         }
         default: {
-          res.status(500).json({ error: e.message ?? e });
-          // return req.session.save(() =>
-          //   res.status(500).json({ message: e.message }),
-          // );
+          // res.status(500).json({ error: e.message ?? e });
+          return req.session.save(() =>
+            res.status(500).json({ message: e.message ?? e }),
+          );
           break;
         }
       }
