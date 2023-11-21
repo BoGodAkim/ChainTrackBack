@@ -32,11 +32,10 @@ export class AppController {
     try {
       if (!req.body.message) {
         return res.status(422).json({
-          message:
-            'Expected prepareMessage object as body. ' +
-            JSON.stringify(req.headers, null, 2) +
-            ' ' +
-            JSON.stringify(req.body, null, 2),
+          message: 'Expected prepareMessage object as body. ',
+          // JSON.stringify(req.headers, null, 2) +
+          // ' ' +
+          // JSON.stringify(req.body, null, 2),
         });
         //(
         //   'Expected prepareMessage object as body. ' +
