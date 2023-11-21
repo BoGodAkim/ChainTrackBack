@@ -31,18 +31,10 @@ export class AppController {
   async verify(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     try {
       if (!req.body.message) {
-        return res.status(422).json({
+        res.status(422).json({
           message: 'Expected prepareMessage object as body. ',
-          // JSON.stringify(req.headers, null, 2) +
-          // ' ' +
-          // JSON.stringify(req.body, null, 2),
         });
-        //(
-        //   'Expected prepareMessage object as body. ' +
-        //   JSON.stringify(req.headers, null, 2) +
-        //   ' ' +
-        //   JSON.stringify(req.body, null, 2)
-        // );
+        return;
       }
 
       const SIWEObject = new SiweMessage(req.body.message);
@@ -53,28 +45,30 @@ export class AppController {
 
       req.session.siwe = message;
       req.session.cookie.expires = new Date(message.expirationTime);
-      return req.session.save(() => res.status(200).send(true));
+      req.session.save(() => res.status(200).send(true));
+      return;
     } catch (e) {
       req.session.siwe = null;
       req.session.nonce = null;
       console.log(e);
       switch (e) {
         case SiweErrorType.EXPIRED_MESSAGE: {
-          return req.session.save(() => res.status(440).json(e));
+          req.session.save(() => res.status(440).json(e));
           break;
         }
         case SiweErrorType.INVALID_SIGNATURE: {
-          return req.session.save(() => res.status(422).json(e));
+          req.session.save(() => res.status(422).json(e));
           break;
         }
         default: {
-          return res.status(500).json(e);
+          res.status(500).json(e);
           // return req.session.save(() =>
           //   res.status(500).json({ message: e.message }),
           // );
           break;
         }
       }
+      return;
     }
   }
 
