@@ -28,20 +28,17 @@ export class AppController {
   }
 
   @Post('/verify')
-  async verify(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<string> {
+  async verify(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     try {
       if (!req.body.message) {
-        res.status(422).json({
+        return res.status(422).json({
           message:
             'Expected prepareMessage object as body. ' +
             JSON.stringify(req.headers, null, 2) +
             ' ' +
             JSON.stringify(req.body, null, 2),
         });
-        return; //(
+        //(
         //   'Expected prepareMessage object as body. ' +
         //   JSON.stringify(req.headers, null, 2) +
         //   ' ' +
@@ -57,8 +54,7 @@ export class AppController {
 
       req.session.siwe = message;
       req.session.cookie.expires = new Date(message.expirationTime);
-      req.session.save(() => res.status(200).send(true));
-      return;
+      return req.session.save(() => res.status(200).send(true));
     } catch (e) {
       req.session.siwe = null;
       req.session.nonce = null;
@@ -77,6 +73,7 @@ export class AppController {
           break;
         }
       }
+      console.error(e);
       return;
       // return e.message;
     }
