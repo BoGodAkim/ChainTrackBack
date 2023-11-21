@@ -73,7 +73,7 @@ export class AppController {
           break;
         }
         default: {
-          return res.status(500).json({ message: e.message });
+          return res.status(500).send(e.message);
           // return req.session.save(() =>
           //   res.status(500).json({ message: e.message }),
           // );
