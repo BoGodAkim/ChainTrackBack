@@ -54,7 +54,7 @@ export class AppController {
         provider,
       );
       const value = await contract.isValidSignature(
-        req.body.message,
+        req.body.hashedMessage,
         req.body.signature,
       );
       if (value !== '0x1626ba7e') {
