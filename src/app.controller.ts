@@ -53,6 +53,9 @@ export class AppController {
         account,
         provider,
       );
+      console.log('message', req.body.message);
+      console.log('signature', req.body.signature);
+      console.log('hashedMessage', req.body.hashedMessage);
       const value = await contract.isValidSignature(
         req.body.hashedMessage,
         req.body.signature,
