@@ -6,7 +6,7 @@ import { UserService } from './database/user.service';
 import { Monitor, Notification } from '@prisma/client';
 import { MonitorService } from './database/monitor.service';
 
-import { JsonRpcProvider, getAddress } from 'ethers';
+import { JsonRpcProvider, getAddress, hexlify } from 'ethers';
 import { LSP0ERC725AccountInit__factory } from '../libs/contracts/factories/LSP0ERC725AccountInit__factory.js';
 
 const provider = new JsonRpcProvider('https://rpc.testnet.lukso.network');
@@ -55,10 +55,11 @@ export class AppController {
       );
       console.log('message', req.body.message);
       console.log('signature', req.body.signature);
+      console.log('hexlify(signature)', hexlify(req.body.signature));
       console.log('hashedMessage', req.body.hashedMessage);
       const value = await contract.isValidSignature(
         req.body.hashedMessage,
-        req.body.signature,
+        hexlify(req.body.signature),
       );
       if (value !== '0x1626ba7e') {
         throw new Error('Invalid token');
