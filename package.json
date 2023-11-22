@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "postinstall": "prisma generate",
-    "build": "nest build",
+    "build": "npm run typechain && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -18,13 +18,16 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typechain": "typechain --target ethers-v6 --out-dir libs/contracts './node_modules/@lukso/lsp-smart-contracts/artifacts/*.json'"
   },
   "dependencies": {
+    "@lukso/lsp-smart-contracts": "^0.12.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.5.2",
+    "@typechain/ethers-v6": "^0.5.1",
     "@vercel/postgres": "^0.5.1",
     "express-session": "^1.17.3",
     "prisma": "^5.5.2",
@@ -54,6 +57,7 @@
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
+    "typechain": "^8.3.2",
     "typescript": "^5.1.3"
   },
   "jest": {

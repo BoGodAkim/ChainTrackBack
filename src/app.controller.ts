@@ -6,6 +6,11 @@ import { UserService } from './database/user.service';
 import { Monitor, Notification } from '@prisma/client';
 import { MonitorService } from './database/monitor.service';
 
+import { JsonRpcProvider, getAddress } from 'ethers';
+import { LSP0ERC725AccountInit__factory } from '../libs/contracts/factories/LSP0ERC725AccountInit__factory.js';
+
+const provider = new JsonRpcProvider('https://rpc.testnet.lukso.network');
+
 declare module 'express-session' {
   export interface SessionData {
     nonce: string;
@@ -38,13 +43,26 @@ export class AppController {
       }
 
       const SIWEObject = new SiweMessage(req.body.message);
-      const { data: message } = await SIWEObject.verify({
-        signature: req.body.signature,
-        nonce: req.session.nonce,
-      });
+      // const { data: message } = await SIWEObject.verify({
+      //   signature: req.body.signature,
+      //   nonce: req.session.nonce,
+      // });
 
-      req.session.siwe = message;
-      req.session.cookie.expires = new Date(message.expirationTime);
+      const account = getAddress(SIWEObject.address);
+      const contract = LSP0ERC725AccountInit__factory.connect(
+        account,
+        provider,
+      );
+      const value = await contract.isValidSignature(
+        req.body.message,
+        req.body.signature,
+      );
+      if (value !== '0x1626ba7e') {
+        throw new Error('Invalid token');
+      }
+
+      req.session.siwe = SIWEObject;
+      req.session.cookie.expires = new Date(SIWEObject.expirationTime);
       res.status(200).send(true);
       return;
     } catch (e) {
